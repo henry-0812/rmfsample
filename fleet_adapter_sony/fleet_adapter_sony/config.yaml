@@ -1,0 +1,111 @@
+# ==============================================================================
+# FleetAdapter Sony - config.yaml
+#
+# 使い方（最低限）
+# - まずは sony: セクションを消したまま（またはコメントアウトのまま）で起動
+#   → RobotClientAPI はシミュレーション backend で動き、ノード起動確認ができます。
+# - Sony FMS (gRPC) へ接続して実機/実機相当で試験する場合は sony: を設定します。
+# ==============================================================================
+
+rmf_fleet:
+  name: "DeliveryBot"
+  fleet_manager:
+    prefix: "http://127.0.0.1:8000"
+    user: "some_user"
+    password: "some_password"
+
+  limits:
+    linear: [0.4, 0.2]   # velocity, acceleration
+    angular: [0.3, 0.35] # velocity, acceleration
+
+  profile:
+    footprint: 0.5
+    vicinity: 0.6
+
+  reversible: false
+
+  battery_system:
+    voltage: 24.0
+    capacity: 40.0
+    charging_current: 26.4
+
+  mechanical_system:
+    mass: 80.0
+    moment_of_inertia: 20.0
+    friction_coefficient: 0.20
+
+  ambient_system:
+    power: 20.0
+
+  tool_system:
+    power: 760.0
+
+  recharge_threshold: 0.20
+  recharge_soc: 1.0
+
+  publish_fleet_state: true
+  account_for_battery_drain: true
+
+  task_capabilities:
+    loop: true
+    delivery: false
+    clean: false
+    finishing_request: "nothing"  # [park, charge, nothing]
+
+robots:
+  deliverybot1:
+    robot_config:
+      max_delay: 10.0
+    rmf_config:
+      robot_state_update_frequency: 0.5
+      start:
+        map_name: "L1"
+        waypoint: null
+        orientation: null
+      charger:
+        waypoint: "charger_deliverybot1"
+
+reference_coordinates:
+  rmf: [[20.33, -3.156], [8.908, -2.57], [13.02, -3.601], [21.93, -4.124]]
+  robot: [[59, 399], [57, 172], [68, 251], [75, 429]]
+
+# ------------------------------------------------------------------------------
+# Sony gRPC settings (enable this section to talk to Sony FMS)
+#
+# Sony提供API仕様書のRPC/Message名に合わせて、RobotClientAPIが
+# - MonitorFleetState (server-stream) で状態を購読
+# - RegisterJobs / StartJobs で MoveJob を投入
+# - GetState でジョブ完了判定
+# - PauseAgent / ResumeAgent で停止/再開
+# を呼べるように作っています。
+# ------------------------------------------------------------------------------
+# sony:
+#   grpc:
+#     target: "127.0.0.1:50051"  # gRPC host:port
+#     secure: false
+#     metadata:
+#       # authorization: "Bearer xxx"
+#       # x-api-key: "xxx"
+#   proto_modules:
+#     # Sonyから提供された .proto を protoc で python 生成した pb2/pb2_grpc のモジュール名
+#     # 例:
+#     # - "sony_fms.job_pb2"
+#     # - "sony_fms.job_pb2_grpc"
+#     # - "sony_fms.fleet_pb2"
+#     # - "sony_fms.fleet_pb2_grpc"
+#     - "sony_fms.job_pb2"
+#     - "sony_fms.job_pb2_grpc"
+#     - "sony_fms.fleet_pb2"
+#     - "sony_fms.fleet_pb2_grpc"
+#     - "sony_fms.common_header_pb2"
+#     - "sony_fms.common_geometry_pb2"
+#   agent_id_by_robot_name:
+#     deliverybot1: "deliverybot1"
+#   navigation:
+#     map_id_default: 1
+#     required_tag_by_waypoint:
+#       charger_deliverybot1: "1/charger"
+#     required_tag_format: "{map_id}/{waypoint}"
+#   monitor_fleet_state:
+#     enable: true
+#     interval_sec: 1.0

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>fleet_adapter_sony</name>
+  <version>0.1.0</version>
+  <description>RMF fleet adapter for Sony FMS (gRPC) with a simulation fallback backend.</description>
+  <maintainer email="devnull@example.com">fleet_adapter_sony</maintainer>
+  <license>Apache License 2.0</license>
+
+  <!-- RMF adapter python runtime -->
+  <exec_depend>rmf_fleet_adapter_python</exec_depend>
+
+  <!-- Common ROS2 Python runtime -->
+  <exec_depend>rclpy</exec_depend>
+
+  <!-- Messages used by RobotCommandHandle (best-effort; may already be brought by rmf_fleet_adapter_python) -->
+  <exec_depend>rmf_fleet_msgs</exec_depend>
+  <exec_depend>rmf_dispenser_msgs</exec_depend>
+  <exec_depend>rmf_ingestor_msgs</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
