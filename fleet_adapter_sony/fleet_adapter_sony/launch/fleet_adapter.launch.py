@@ -3,6 +3,7 @@ from __future__ import annotations
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
+from launch.conditions import IfCondition, UnlessCondition
 from launch_ros.actions import Node
 
 
@@ -41,6 +42,7 @@ def generate_launch_description() -> LaunchDescription:
             description='Use Gazebo/Sim time (true/false)',
         ),
         Node(
+            condition=UnlessCondition(use_sim_time),
             package='fleet_adapter_sony',
             executable='fleet_adapter',
             name='fleet_adapter_sony',
@@ -49,7 +51,21 @@ def generate_launch_description() -> LaunchDescription:
                 '-c', config_file,
                 '-n', nav_graph,
                 '-s', server_uri,
-                '--use_sim_time', use_sim_time,
             ],
+            parameters=[{'use_sim_time': use_sim_time}],
+        ),
+        Node(
+            condition=IfCondition(use_sim_time),
+            package='fleet_adapter_sony',
+            executable='fleet_adapter',
+            name='fleet_adapter_sony',
+            output='screen',
+            arguments=[
+                '-c', config_file,
+                '-n', nav_graph,
+                '-s', server_uri,
+                '--use_sim_time',
+            ],
+            parameters=[{'use_sim_time': use_sim_time}],
         ),
     ])

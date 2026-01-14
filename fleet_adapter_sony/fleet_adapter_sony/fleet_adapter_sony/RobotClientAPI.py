@@ -211,10 +211,15 @@ class _SimBackend(_BackendBase):
         except Exception:
             return False
 
+        if abs(theta) <= (2.0 * math.pi + 0.5):
+            theta_deg = math.degrees(theta)
+        else:
+            theta_deg = theta
+
         with self._lock:
             st.dest_x = x
             st.dest_y = y
-            st.dest_theta_deg = theta
+            st.dest_theta_deg = theta_deg
             st.moving = True
         return True
 
